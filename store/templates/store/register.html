@@ -1,0 +1,37 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Register{% endblock %}
+{% block content %}
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create an Account</h2>
+    
+        <form action="{% url 'register' %}" method="POST" class="space-y-5">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+    
+            <!-- Submit Button -->
+            <div>
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition">
+                Register
+            </button>
+            </div>
+        </form>
+    
+        <!-- Already have an account -->
+        <p class="text-center text-sm text-gray-600 mt-4">
+            Already have an account?
+            <a href="#" class="text-blue-600 hover:underline">Login here</a>
+        </p>
+        </div>
+    </div>
+{% endblock %}

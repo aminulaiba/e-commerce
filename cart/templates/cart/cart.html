@@ -1,0 +1,126 @@
+{% extends 'store/base.html' %}
+
+
+{% block content %}
+    <div class="max-w-4xl mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold mb-6">Your Shopping Cart</h1>
+
+        <!-- Cart Item -->
+         {% for item in cart_products %}
+
+            <div id="" class="product-container bg-white rounded-lg shadow-md p-6 mb-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img src="{{ item.product.image.url }}" alt="Product" class="w-20 h-20 object-cover rounded">
+                    <div>
+                        <h2 class="text-lg font-semibold">{{item.product.name}}</h2>
+                        <p class="text-sm text-gray-600">{{item.product.description}}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold">
+                        {% if item.product.on_sale %}
+                            {{ item.product.sale_price }} tk
+                        {% else %}
+                            {{ item.product.price }} tk
+                        {% endif %}
+                    </p>
+
+                    <p class="sub-total font-semibold mt-1">
+                        
+                    </p>
+
+                    <input type="number" min="1" value="{{ item.qty }}" data-prod-id="{{ item.product.id }}" class="updatebtn w-16 border rounded text-center mt-2 px-2 py-1">
+                    <button type="button" data-prod-id="{{ item.product.id }}" title="Remove from cart" class="delBtn bg-red-500 hover:bg-red-800 text-white rounded p-1 transition">🗑️</button>
+                </div>
+            </div>
+
+         {% endfor %}
+
+        <!-- Repeat above block for each item (you'll loop in Django) -->
+
+        <!-- Cart Summary -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+            <div class="flex justify-between mb-2">
+                <span class="text-gray-700">Subtotal</span>
+                <span class="font-semibold sub-total">{{ subtotal }} tk</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="text-gray-700">Shipping</span>
+                <span class="font-semibold shipping">{{shipping}} tk</span>
+            </div>
+            <div class="flex justify-between text-xl font-bold border-t pt-4">
+                <span>Total</span>
+                <span id="total">{{total}} tk</span>
+            </div>
+
+            <button class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const updatebtn = document.querySelectorAll('.updatebtn')
+            let updvalue;
+            let debounceTimeout;
+            updatebtn.forEach(input=>{
+                input.addEventListener('input', function(){
+                    updvalue = this.value;
+                    prodId = this.dataset.prodId
+                    clearTimeout(debounceTimeout);
+                    debounceTimeout = setTimeout(() => {
+                        console.log(updvalue);
+
+                        fetch("{% url 'cart-update' %}", {
+                            method: "POST",
+                            headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({prodId: prodId, updval: updvalue})
+                        })
+                        .then(res=> res.json())
+                        .then(data => {
+                        document.getElementById('count').innerText= data.cart;
+                    });
+                        
+                    }, 1000);
+                })
+            })
+
+
+
+
+
+
+            // deleting cart
+            const delBtn = document.querySelectorAll('.delBtn');
+            delBtn.forEach(delBtn => {
+                delBtn.addEventListener('click', function(){
+                    prodId = this.dataset.prodId
+                    prodContainer = this.closest('.product-container')
+
+                    fetch("{% url 'cart-delete' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({prodId: prodId})
+                    }).then(res => res.json())
+                    .then(data => {
+                        document.getElementById('count').innerText= data.cart;
+                        prodContainer.remove();
+                    })
+                  
+                })
+            })
+
+        })
+    </script>
+{% endblock %}
