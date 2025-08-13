@@ -1,0 +1,43 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+    <h1>Allah is the Almighty!</h1>
+    <div class="flex flex-wrap justify-center m-3">
+        {% for p in prods %}
+        <div class="relative h-96 w-64 min-w-[50] m-3 border border-gray-300 flex flex-col justify-between">                
+            <a href="{% url 'product' p.id %}" class="flex flex-col grow justify-between">
+                <div class="w-full h-64 border-b border-gray-200 overflow-hidden bg-white">
+                    <img src="{{ p.image.url }}" alt="{{ p.name }}" class="w-full object-cover">
+                </div>
+                <div class="mx-2">
+                    <h2 class="py-1">{{ p.name }}</h2>
+                </div>
+                <div class="mx-auto">
+                    {% if p.on_sale %}
+                        <!-- Badge -->  
+                        <div class="absolute top-1.5 right-1.5 z-10 bg-black text-white text-[7.5px] font-semibold px-1 py-0.5 rounded-md ">
+                            Sale
+                        </div>
+                        <div class="text-blue-600 font-bold text-center my-2">
+                            <strike>{{ p.price }}</strike>&nbsp; {{ p.sale_price }} tk                            
+                        </div>
+                    {% else %}
+                        <div class="text-blue-600 font-bold text-center my-2">
+                            {{ p.price }} tk
+                        </div>
+                    {% endif %}                
+                </div>
+
+            </a>
+
+
+            <div class="my-3 flex justify-center">
+                <button value="{{ p.id }}" class="addtobtn px-6 py-1.5 bg-blue-500 text-white font-semibold rounded hover:bg-blue-700 transition duration-200">Add to card</button>
+            </div>
+        </div>
+         
+        {% endfor %}
+    </div>
+{% endblock %}
+
+

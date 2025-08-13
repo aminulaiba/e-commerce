@@ -1,0 +1,8 @@
+from .cart import Cart
+
+def cart(request):
+    cart = Cart(request)
+    return {
+        'cart': cart,
+        'prod_count': sum(cart.cart.values()),
+    }
