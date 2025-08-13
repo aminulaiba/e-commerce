@@ -50,21 +50,24 @@ class Cart:
     def cart_products(self):
         productList = self.cart.keys()
         cart_products = []
-        total = 0
-        for i in productList:
-            product = Product.objects.get(id=i)
-            if product.on_sale:
-                sub_total = product.sale_price * self.cart[i]
-            else:
-                sub_total = product.price * self.cart[i]
-
-            total += sub_total
-
-            dic = {'product': product, 'qty': self.cart[i], 'sub_total': sub_total}
+        total, products = self.checkout_totals()
+        for p_id, v in products.items():
+            dic = {'product': v, 'qty': self.cart[str(p_id)]}
             cart_products.append(dic)
-
-        # cart_products = Product.objects.filter(id__in=productList)
-
         return cart_products, total
+    
+
+    # Final total from DB for checkout
+    def checkout_totals(self):
+        cart = self.cart
+        products_ids = self.cart.keys()
+        total = 0
+        products = Product.objects.filter(id__in=products_ids).in_bulk()
+
+        for id, prod in products.items():
+            current_price = prod.sale_price if prod.on_sale else prod.price
+            sub_tot = current_price*cart[str(id)]
+            total += sub_tot
+        return total, products
 
 

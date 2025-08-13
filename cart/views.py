@@ -12,6 +12,8 @@ def cart(request):
     print(dict(request.session))
     cart = Cart(request)
     cart_products, subtotal_price = cart.cart_products()
+    tot=cart.checkout_totals()
+    print("actual totals from db: ", tot)
     shipping = 30
     total = subtotal_price+shipping
     return render(request, 'cart/cart.html', {'cart_products': cart_products, 'subtotal': subtotal_price, 'shipping': shipping, 'total': total })
