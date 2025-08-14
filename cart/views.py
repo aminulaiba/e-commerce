@@ -25,17 +25,16 @@ def cart_add(request):
         product_qty = int(json.loads(request.body).get('qty'))
 
         product = get_object_or_404(Product, pk=product_id)
-        total_cart_items = cart.add(product_id, product_qty)
-
-        return JsonResponse({'cart': total_cart_items})
+        total_cart_items, total = cart.add(product_id, product_qty)
+        return JsonResponse({'cart': total_cart_items, 'total': total})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def cart_delete(request):
     body = request.body
     prodId = json.loads(body).get('prodId')
     cart = Cart(request)
-    total_cart_items = cart.remove(prodId)
-    return JsonResponse({'cart': total_cart_items, 'total_sum': 'upcoming'})
+    total_cart_items, total = cart.remove(prodId)
+    return JsonResponse({'cart': total_cart_items, 'total': total})
     # return JsonResponse({'redirect_url': reverse('cart')})
 
 def cart_update(request):
@@ -44,6 +43,6 @@ def cart_update(request):
     prodId = body.get('prodId')
     updval = int(body.get('updval'))
     # cart.update(prodId, updval)
-    total_cart_items = cart.update(prodId, updval)
-    return JsonResponse({'cart': total_cart_items})
+    total_cart_items, total = cart.update(prodId, updval)
+    return JsonResponse({'cart': total_cart_items, 'total': total})
 

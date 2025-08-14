@@ -42,11 +42,11 @@
         <div class="bg-white rounded-lg shadow-md p-6 mt-6">
             <div class="flex justify-between mb-2">
                 <span class="text-gray-700">Subtotal</span>
-                <span class="font-semibold sub-total">{{ subtotal }} tk</span>
+                <span id="sub-total" class="font-semibold">{{ subtotal }} tk</span>
             </div>
             <div class="flex justify-between mb-2">
                 <span class="text-gray-700">Shipping</span>
-                <span class="font-semibold shipping">{{shipping}} tk</span>
+                <span id="shipping" class="font-semibold">{{shipping}} tk</span>
             </div>
             <div class="flex justify-between text-xl font-bold border-t pt-4">
                 <span>Total</span>
@@ -65,6 +65,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function(){
+            const subtotal = document.getElementById('sub-total');
+            const shipping = document.getElementById('shipping');
+            const total = document.getElementById('total');
+            // Function to extract numeric value from text like "27000.0 tk"
+            function extractNumber(text) {
+                return parseFloat(text.replace(/[^\d.]/g, ""));
+            }
+
             const updatebtn = document.querySelectorAll('.updatebtn')
             let updvalue;
             let debounceTimeout;
@@ -74,8 +82,6 @@
                     prodId = this.dataset.prodId
                     clearTimeout(debounceTimeout);
                     debounceTimeout = setTimeout(() => {
-                        console.log(updvalue);
-
                         fetch("{% url 'cart-update' %}", {
                             method: "POST",
                             headers: {
@@ -87,15 +93,14 @@
                         .then(res=> res.json())
                         .then(data => {
                         document.getElementById('count').innerText= data.cart;
+                        subtotal.innerText = data.total+" tk";
+                        shipping_cost= extractNumber(shipping.textContent)
+                        total.innerText = data.total+shipping_cost+" tk";
                     });
                         
                     }, 1000);
                 })
             })
-
-
-
-
 
 
             // deleting cart
@@ -116,7 +121,11 @@
                     .then(data => {
                         document.getElementById('count').innerText= data.cart;
                         prodContainer.remove();
-                    })
+                        subtotal.innerText = data.total+" tk";
+                        shipping_cost= extractNumber(shipping.textContent)
+                        total.innerText = data.total+shipping_cost+" tk";
+                    });
+
                   
                 })
             })

@@ -31,24 +31,27 @@ class Cart:
         else:
             self.cart[product_id] = quantity
         self.save()
-        return sum(self.cart.values())
+        total, cart_prods = self.checkout_totals()
+        
+        return sum(self.cart.values()), total
     
     def update(self, prodId, updval):
         if prodId in self.cart:
             self.cart[prodId] = updval
             self.save()
-            return sum(self.cart.values())
-        else:
-            return "prod id isnt in the session"
+            total, cart_prods = self.checkout_totals()
+            print('total: ', total, 'pros: ', cart_prods)
+            return sum(self.cart.values()), total
+
 
     def remove(self, product_id):
         if product_id in self.cart:
             del self.cart[product_id]
             self.save()
-        return sum(self.cart.values())
+            total, cart_prods = self.checkout_totals()
+        return sum(self.cart.values()), total
 
     def cart_products(self):
-        productList = self.cart.keys()
         cart_products = []
         total, products = self.checkout_totals()
         for p_id, v in products.items():
@@ -66,7 +69,7 @@ class Cart:
 
         for id, prod in products.items():
             current_price = prod.sale_price if prod.on_sale else prod.price
-            sub_tot = current_price*cart[str(id)]
+            sub_tot = float(current_price*cart[str(id)])
             total += sub_tot
         return total, products
 
