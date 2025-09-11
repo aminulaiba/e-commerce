@@ -18,7 +18,28 @@
     <header class="bg-white shadow">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <a href="{% url 'home' %}" class="text-xl font-bold text-blue-600">MyShop</a>
-            <nav class="space-x-4">
+            <nav class="flex items-center space-x-4">
+
+                <!-- 🔍 Search Form -->
+                <form method="GET" action="{% url 'home' %}" class="relative w-48">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Search products..."
+                        value="{{ request.GET.q }}"
+                        class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    
+                    <!-- 🔍 Icon button inside input -->
+                    <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"/>
+                        </svg>
+                    </button>
+                </form>
+
                 <a href="" class="text-gray-700 hover:text-blue-500">
                     <div class="relative inline-block group">
                         <!-- Trigger Button -->
@@ -48,7 +69,7 @@
                 </a>
                 {% if user.is_authenticated %}
                     
-                    <span class="text-white hover:bg-yellow-700 bg-yellow-600 font-semibold px-3 py-1 pb-2 rounded-lg">{{ user.username }}</span>
+                    <a href="{% url 'update-user' %}" class="text-white hover:bg-yellow-700 bg-yellow-600 font-semibold px-3 py-1 pb-2 rounded-lg">{{ user.username }}</a>
                     <a href="{% url 'logout' %}" class="text-white hover:bg-blue-700 bg-blue-600 font-semibold px-3 py-1 pb-2 rounded-lg">LogOut</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="text-white hover:bg-blue-700 bg-blue-600 font-semibold px-3 py-1 pb-2 rounded-lg">LogIn</a>
@@ -57,6 +78,27 @@
             </nav>
         </div>
     </header>
+
+
+    <!-- Toast Container (center of screen) -->
+    <div id="toast-container" class="fixed inset-0 flex flex-col items-center justify-center z-50 pointer-events-none">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast pointer-events-auto transition-opacity duration-500 ease-in-out
+                            px-6 py-4 rounded-lg shadow-xl
+                            backdrop-blur-sm text-gray-800 text-lg font-medium
+                            border-l-4
+                            {% if message.tags == 'success' %}border-green-500 bg-green-50/70{% endif %}
+                            {% if message.tags == 'error' %}border-red-500 bg-red-50/70{% endif %}
+                            {% if message.tags == 'warning' %}border-yellow-500 bg-yellow-50/70{% endif %}
+                            {% if message.tags == 'info' %}border-blue-500 bg-blue-50/70{% endif %}
+                            ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
 
     <!-- Main Content -->
     <main class="container mx-auto">
@@ -99,6 +141,14 @@
                 });
             });
 
+            // message popup js
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach((toast, index) => {
+                setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                    setTimeout(() => toast.remove(), 500); // Remove after fade-out
+                }, 3000 + index * 100); // 3s visible + fade out
+            });
         });
     </script>
 </body>
