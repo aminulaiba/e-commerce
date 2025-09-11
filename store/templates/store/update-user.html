@@ -1,0 +1,22 @@
+{% extends 'store/base.html' %}
+{% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit" class="text-white hover:bg-blue-700 bg-blue-600 font-semibold px-3 py-1 pb-2 rounded-lg my-2">Update</button>
+</form>
+
+
+
+<h3>
+    <a href="{% url 'password-change' %}" class="text-blue-500">
+        Change Password
+    </a>
+</h3>
+<h3>
+    <a href="{% url 'update-profile' %}" class="text-blue-500">
+        Edit profile
+    </a>
+</h3>
+{% endblock %}

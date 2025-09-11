@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from .forms import SignUpForm
+from .forms import SignUpForm, UpdateUserForm, PasswordChange, UpdateProfileForm
 
 # Create your views here.
 
@@ -19,8 +19,13 @@ def start(request):
 
 
 def home(request):
-    products = Product.objects.all()
+    query = request.GET.get('q')
     category = Category.objects.all()
+    
+    if query:
+        products = Product.objects.filter(name__icontains=query)
+    else:
+        products = Product.objects.all()
     return render(request, 'store/home.html', {'prods': products, 'category': category})
 
 
@@ -54,7 +59,7 @@ def register_user(request):
             user = authenticate(request, username=username, password=password)
             login(request, user)
             messages.success(request, ("Successfull LoggedIn!:)"))
-            return redirect(home)
+            return redirect('update-profile')
         else:
             messages.success(request, ("Something is wrong in login!:)"))
     else:
@@ -70,3 +75,55 @@ def category(request, name):
     category = Category.objects.get(name=name)
     products = Product.objects.filter(category=category)
     return render(request, 'store/home.html', {'prods': products})
+
+
+def update_user(request):
+    if request.user.is_authenticated:
+        current_user = User.objects.get(id=request.user.id)
+        form = UpdateUserForm(request.POST or None, instance=current_user)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Updated Done.")
+            return redirect('home')
+        return render(request, 'store/update-user.html', {'form':form})
+    
+
+    
+# updating the extra info about the user   
+def update_profile(request):
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        if request.method == "POST":
+            form = UpdateProfileForm(request.POST, instance=profile)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profile saved successfully!")
+                return redirect('update-user')
+        else:
+            form = UpdateProfileForm(instance=profile)
+    return render(request, 'store/profile-update.html', {'form': form})
+
+
+
+    
+
+def password_change(request):
+    current_user = request.user
+    if current_user.is_authenticated:
+        if request.method == 'POST':
+            form = PasswordChange(current_user, request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Password has changed.")
+            else:
+                for field_errors in form.errors.values():
+                    for error in field_errors:
+                        messages.error(request, error)
+                return redirect('password-change')
+        else:
+            form = PasswordChange(current_user)
+    else:
+        messages.success(request, "U need to login first!")
+    return render(request, 'store/password-change.html', {'form': form})  
+        
