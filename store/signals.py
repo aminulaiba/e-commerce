@@ -40,8 +40,7 @@ def merge_cart(sender, request, user, **kwargs):
             cart=cart,
             product=product,
             defaults={
-                'quantity':quantity,
-                'price_at_time': product.sale_price if product.on_sale else product.price
+                'quantity':quantity
             }
         )
 
