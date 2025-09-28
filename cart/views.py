@@ -10,11 +10,11 @@ from django.urls import reverse
 
 def cart(request):
     cart = CartManager(request)
-    cart_products, subtotal_price =cart.cart_products()
+    cart_items, subtotal_price =cart.cart_products()
+
     shipping = 30 if subtotal_price!=0 else 0
     total = subtotal_price+shipping
-    # print('cart products: ', cart_products)
-    return render(request, 'cart/cart.html', {'cart_products': cart_products, 'subtotal': subtotal_price, 'shipping': shipping, 'total': total})
+    return render(request, 'cart/cart.html', {'cart_products': cart_items, 'subtotal': subtotal_price, 'shipping': shipping, 'total': total})
     
 
 def cart_add(request):

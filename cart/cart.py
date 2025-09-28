@@ -34,37 +34,45 @@ class SessionCart:
         if prodId in self.cart:
             self.cart[prodId] = updval
             self.save()
-            total, cart_prods = self.checkout_totals()
-            print('total: ', total, 'pros: ', cart_prods)
+
+            total = self.checkout_totals()
+            print('total: ', total)
             return sum(self.cart.values()), total
 
     def remove(self, product_id):
         if product_id in self.cart:
             del self.cart[product_id]
             self.save()
-            total, cart_prods = self.checkout_totals()
+            total = self.checkout_totals()
         return sum(self.cart.values()), total
 
     def cart_products(self):
-        cart_products = []
-        total, products = self.checkout_totals()
-        for p_id, v in products.items():
-            dic = {'product': v, 'price_at_time': v.sale_price if v.on_sale else v.price, 'qty': self.cart[str(p_id)]}
-            cart_products.append(dic)
-        return cart_products, total
+        products_ids = self.cart.keys()
+        cart_products = Product.objects.filter(id__in=products_ids)
+
+        products_list = []
+        for item in cart_products:
+            # this structure would mimic the queryset with .select_related() that used for loggedin user 
+            # so that the same template can handle both for annonymous and loged user.
+            dic = {'product': item, 'quantity': self.cart[str(item.id)]} 
+            products_list.append(dic)
+
+        subtotal = self.checkout_totals()
+        return products_list, subtotal
     
     # Final total from DB for checkout
     def checkout_totals(self):
         cart = self.cart
-        products_ids = self.cart.keys()
         total = 0
-        products = Product.objects.filter(id__in=products_ids).in_bulk()
 
-        for id, prod in products.items():
+        products_ids = self.cart.keys()
+        cart_products = Product.objects.filter(id__in=products_ids)
+    
+        for prod in cart_products:
             current_price = prod.sale_price if prod.on_sale else prod.price
-            sub_tot = float(current_price*cart[str(id)])
+            sub_tot = float(current_price*cart[str(prod.id)])
             total += sub_tot
-        return total, products
+        return total
 
 
 
@@ -77,57 +85,56 @@ class DBCart:
         self.user = user
         self.cart = Cart.objects.filter(user=user, is_active=True).last()
 
+    # im not using this property coz if i use it in the checkout_total method directly then it need to be called twich in the cart view.
+    # one for having all the product and another for the total itself. but now im calling the db once and then passing it as arg in the
+    # check_total
+    # @property
+    # def cart_items(self):
+    #     return self.cart.items.select_related("product")
+
     def cart_products(self):
-        # cart_products = CartItem.objects.filter(cart=self.cart)
-        cart_products = []
-        # item structure is {'product': v, 'qty': self.cart[str(p_id)]}
-        products = self.cart.items.all()
-        for item in products:
-            dic = {'product': item.product, 'price_at_time': item.price_at_time, 'qty': item.quantity}
-            cart_products.append(dic)
-        total = self.checkout_totals()
-        return cart_products, total
+        cart_items = self.cart.items.select_related("product")
+        total = self.checkout_totals(cart_items)
+        print(total)
+        return cart_items, total
     
-    def checkout_totals(self):
-        return sum([p.price_at_time*p.quantity for p in self.cart.items.all()])
+    def checkout_totals(self, cart_items):
+        return sum((p.product.sale_price if p.product.on_sale else p.product.price) * p.quantity for p in cart_items)
 
     def total_quantity(self):
         return self.cart.items.aggregate(total=Sum('quantity'))['total'] or 0
-    def item_current_price(self, product_id):
-        product = get_object_or_404(Product, id=product_id)
-        return product.price if not product.on_sale else product.sale_price
 
     def add(self, product_id, quantity=1):
         item, created = CartItem.objects.get_or_create(
             cart=self.cart,
              product_id=product_id,
               defaults={
-                  'quantity': 1,
-                  'price_at_time': self.item_current_price(product_id)
+                  'quantity': quantity,
                   }
             )
         if not created:
             item.quantity = item.quantity+ quantity
             item.save()
-
         total_quantity = self.cart.items.aggregate(total=Sum('quantity'))['total'] or 0
         return total_quantity
     
     def update(self, prodId, updval):
-        print("hiii")
         cart_item = self.cart.items.get(cart=self.cart, product__id=prodId)
         cart_item.quantity = updval
         cart_item.save()
+        cart_items = self.cart.items.select_related("product")
         total_quantity = self.total_quantity()
-        total = self.checkout_totals()
-        print(cart_item)
+        total = self.checkout_totals(cart_items)
+
         return total_quantity, total
 
     def remove(self, product_id):
         item = self.cart.items.get(cart=self.cart, product_id=product_id)
         item.delete()
         total_quantity = self.total_quantity()
-        total = self.checkout_totals()
+        cart_items = self.cart.items.select_related("product")
+
+        total = self.checkout_totals(cart_items)
         return total_quantity, total
 
 
