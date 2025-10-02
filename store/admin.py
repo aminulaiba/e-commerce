@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Customer, Product, Order, Profile
+from .models import Category, Customer, Product, Profile
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
@@ -7,7 +7,6 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 admin.site.register(Category)
 admin.site.register(Customer)
 admin.site.register(Product)
-admin.site.register(Order)
 admin.site.register(Profile)
 
 class ProfileInline(admin.StackedInline):

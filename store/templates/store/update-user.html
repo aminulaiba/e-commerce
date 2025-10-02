@@ -3,7 +3,55 @@
 
 <form action="" method="POST">
     {% csrf_token %}
-    {{ form }}
+    <div class="py-3">
+        <h1 class="my-5 py-2 px-1 text-lg font-semibold bg-gray-600 text-white rounded">User Informations</h1>
+        {{ form }}
+    </div>
+    <div class="my-2">
+        <h1 class="my-5 py-2 px-1 text-lg font-semibold bg-gray-600 text-white rounded">Profile Informations</h1>
+        {{ profile_form }}
+    </div>
+    <div class="my-2">
+        <h1 class="my-5 py-2 px-1 text-lg font-semibold bg-gray-600 text-white rounded">Shipping Address</h1>
+        {% if shipping_addresses %}
+            <div class="overflow-x-auto mt-4">
+                <table class="min-w-full bg-white shadow-md rounded overflow-hidden">
+                    <thead class="bg-gray-300">
+                        <tr>
+                            <th class="text-left px-6 py-1.5">Name</th>
+                            <th class="text-left px-6 py-1.5">Address</th>
+                            <th class="text-left px-6 py-1.5">Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for info in shipping_addresses %}
+                            <tr class="{% if info.is_default %}bg-blue-100 hover:bg-blue-200{% else %}hover:bg-gray-100{% endif %}">
+                                <td class="px-6 py-1.5">{{ info.full_name }}</td>
+                                <td class="px-6 py-1.5">{{ info.address_line_1 }}</td>
+                                <td class="px-6 py-1.5">{{ info.phone }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="3" class="px-6 py-1.5 text-center text-3xl font-semibold text-gray-600 hover:bg-green-300">
+                                    <a href="{% url 'shippingaddress-add' %}" class="block w-full h-full">
+                                        +
+                                    </a>
+                                </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+        <div class="">
+            <h1 class="text-center bg-gray-200 p-4 rounded-lg mt-4">No address info. Add one.</h1>
+            <a href="{% url 'shippingaddress-add' %}" class="block w-full text-center text-white hover:bg-green-600 bg-green-500 font-semibold px-3 py-3 my-3 rounded-lg">
+                Add
+            </a>
+            
+        </div>
+        {% endif %}
+    </div>
+
     <button type="submit" class="text-white hover:bg-blue-700 bg-blue-600 font-semibold px-3 py-1 pb-2 rounded-lg my-2">Update</button>
 </form>
 

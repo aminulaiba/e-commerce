@@ -54,14 +54,4 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    address = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    date = models.DateField(auto_now_add=True)
-    status = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.product} --> {self.customer}"
