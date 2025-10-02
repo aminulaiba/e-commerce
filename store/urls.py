@@ -12,4 +12,7 @@ urlpatterns = [
     path('pass-change/', views.password_change, name='password-change'),
     path('detail/<int:pk>', views.product, name='product'),
     path('category/<str:name>', views.category, name='category'),
+
+    path('shippingaddress-add/', views.shipping_address, name='shippingaddress-add'),
+
 ] 

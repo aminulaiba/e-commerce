@@ -55,7 +55,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.TextField()
-    billing_address = models.TextField(blank=True, null=True)
+    # billing_address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50)
     transaction_id = models.CharField(max_length=100, blank=True, null=True)
     
@@ -72,3 +72,17 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f"{self.quantity} x {self.product_name} (Order #{self.order.order_number})"
+    
+
+
+
+class Shipping(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100) # receiver full name
+    phone = models.CharField(max_length=20)
+    city = models.CharField(max_length=100)
+    address_line_1 = models.CharField(max_length=225)
+    postal_code = models.CharField(max_length=20, null=True, blank=True)
+    is_default = models.BooleanField(default=False)
+    

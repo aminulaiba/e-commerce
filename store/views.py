@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
 from .forms import SignUpForm, UpdateUserForm, PasswordChange, UpdateProfileForm
+from cart.forms import ShippingForm
 
 # Create your views here.
 
@@ -82,12 +83,35 @@ def update_user(request):
         current_user = User.objects.get(id=request.user.id)
         form = UpdateUserForm(request.POST or None, instance=current_user)
         
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Updated Done.")
-            return redirect('home')
-        return render(request, 'store/update-user.html', {'form':form})
+        profile = request.user.profile
+        profile_form = UpdateProfileForm(request.POST or None, instance=profile)
+        shipping_addresses = current_user.shipping_set.all()
+        if request.method == "POST":
+            if form.is_valid() and profile_form.is_valid():
+                form.save()
+                profile_form.save()
+                messages.success(request, "Updated Done.")
+                return redirect('home')
+    context={'form':form, 'profile_form':profile_form, 'shipping_addresses':shipping_addresses}
+    return render(request, 'store/update-user.html', context=context)
     
+
+def shipping_address(request):
+    form = ShippingForm()
+    if request.method == "POST":
+        form = ShippingForm(request.POST)
+        if form.is_valid():
+            shiping=form.save(commit=False)
+            shiping.user = request.user
+            shiping.save()
+            return redirect('update-user')
+
+    return render(request, 'store/shipping.html', {'form':form})
+
+
+
+
+
 
     
 # updating the extra info about the user   
