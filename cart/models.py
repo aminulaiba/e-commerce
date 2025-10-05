@@ -85,4 +85,7 @@ class Shipping(models.Model):
     address_line_1 = models.CharField(max_length=225)
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.full_name} -- {self.address_line_1}"
     

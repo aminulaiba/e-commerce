@@ -1,0 +1,121 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto max-h-full px-4 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+  <!-- LEFT: Checkout Form -->
+  <div class="lg:col-span-2">
+    <h1 class="text-2xl font-bold mb-6">Checkout</h1>
+
+    <form method="POST" action="" class="bg-white shadow-md rounded-lg p-6 space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block font-semibold mb-1">Full Name</label>
+        <input type="text" name="full_name" required class="w-full border rounded px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1">Phone Number</label>
+        <input type="text" name="phone" required class="w-full border rounded px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1">Shipping Address</label>
+        <textarea name="address" rows="3" required class="w-full border rounded px-4 py-2"></textarea>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1">Payment Method</label>
+        <select name="payment_method" id="payment-method" class="w-full border rounded px-4 py-2">
+          <option value="cod">Cash on Delivery</option>
+          <option value="bkash">bKash</option>
+          <option value="card">Credit/Debit Card</option>
+        </select>
+      </div>
+
+      <!-- Conditional Inputs -->
+      <div id="bkash-number-field" class="hidden">
+        <label class="block font-semibold mb-1">bKash Number</label>
+        <input type="text" name="bkash_number" placeholder="01XXXXXXXXX" class="w-full border rounded px-4 py-2">
+      </div>
+
+      <div id="card-number-field" class="hidden">
+        <label class="block font-semibold mb-1">Card Number</label>
+        <input type="text" name="card_number" placeholder="**** **** **** ****" class="w-full border rounded px-4 py-2">
+      </div>
+
+      <button type="submit" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition">
+        Place Order
+      </button>
+    </form>
+  </div>
+
+  <!-- RIGHT: Cart Sidebar -->
+  <div class="bg-white shadow-md rounded-lg p-6 sticky top-10 h-fit">
+    <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+
+    <!-- Product List -->
+    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      {% for item in cart_products %}
+        <div class="flex items-center gap-4 border-b pb-3">
+          <img src="{{ item.product.image.url }}" alt="Product" class="w-14 h-14 object-cover rounded">
+          <div class="flex-1">
+            <h3 class="text-sm font-semibold">{{ item.product.name }}</h3>
+            <p class="text-xs text-gray-500">Qty: {{ item.quantity }}</p>
+          </div>
+          <div class="text-sm font-semibold text-gray-800">
+            {% if item.product.on_sale %}
+              {{ item.product.sale_price }}
+            {% else %}
+              {{ item.product.price }}
+            {% endif %}
+            <span class="text-xs text-gray-400">tk</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Summary -->
+    <div class="mt-6 pt-4 border-t text-sm">
+      <div class="flex justify-between mb-2">
+        <span class="text-gray-700">Subtotal</span>
+        <span>{{ subtotal }} tk</span>
+      </div>
+      <div class="flex justify-between mb-2">
+        <span class="text-gray-700">Shipping</span>
+        <span>{{ shipping }} tk</span>
+      </div>
+      <div class="flex justify-between font-bold text-base border-t pt-2">
+        <span>Total</span>
+        <span>{{ total }} tk</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- JavaScript for Conditional Payment Inputs -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const paymentMethod = document.getElementById('payment-method');
+    const bkashField = document.getElementById('bkash-number-field');
+    const cardField = document.getElementById('card-number-field');
+
+    function togglePaymentFields() {
+      bkashField.classList.add('hidden');
+      cardField.classList.add('hidden');
+
+      if (paymentMethod.value === 'bkash') {
+        bkashField.classList.remove('hidden');
+      } else if (paymentMethod.value === 'card') {
+        cardField.classList.remove('hidden');
+      }
+    }
+
+    togglePaymentFields();
+    paymentMethod.addEventListener('change', togglePaymentFields);
+  });
+</script>
+
+{% endblock %}

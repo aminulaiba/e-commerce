@@ -1,7 +1,8 @@
 import json
 from django.http import JsonResponse
-from .cart import SessionCart, DBCart, CartManager
+from .cart import CartManager
 from store.models import Product
+from .models import Shipping
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
@@ -12,9 +13,14 @@ def cart(request):
     cart = CartManager(request)
     cart_items, subtotal_price =cart.cart_products()
 
+    if request.user.is_authenticated:
+        saved_addresses = Shipping.objects.filter(user=request.user)
+    else:
+        saved_addresses = []
+
     shipping = 30 if subtotal_price!=0 else 0
     total = subtotal_price+shipping
-    return render(request, 'cart/cart.html', {'cart_products': cart_items, 'subtotal': subtotal_price, 'shipping': shipping, 'total': total})
+    return render(request, 'cart/cart-test.html', {'cart_products': cart_items, 'subtotal': subtotal_price, 'shipping': shipping, 'total': total, 'saved_addresses':saved_addresses})
     
 
 def cart_add(request):
