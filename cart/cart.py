@@ -36,7 +36,7 @@ class SessionCart:
             self.save()
 
             total = self.checkout_totals()
-            print('total: ', total)
+            # print('total: ', total)
             return sum(self.cart.values()), total
 
     def remove(self, product_id):
@@ -95,7 +95,7 @@ class DBCart:
     def cart_products(self):
         cart_items = self.cart.items.select_related("product")
         total = self.checkout_totals(cart_items)
-        print(total)
+        # print(total)
         return cart_items, total
     
     def checkout_totals(self, cart_items):
