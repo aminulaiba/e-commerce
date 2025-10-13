@@ -87,5 +87,5 @@ class Shipping(models.Model):
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.full_name} -- {self.address_line_1}"
+        return f"{self.full_name} ({self.phone}) -- {self.address_line_1}"
     

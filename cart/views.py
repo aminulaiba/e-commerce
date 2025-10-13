@@ -12,7 +12,6 @@ from django.urls import reverse
 def cart(request):
     cart = CartManager(request)
     cart_items, subtotal_price =cart.cart_products()
-
     if request.user.is_authenticated:
         saved_addresses = Shipping.objects.filter(user=request.user)
     else:
