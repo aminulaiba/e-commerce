@@ -1,0 +1,36 @@
+<div id="step-3-content" class="page-content max-w-xl mx-auto text-center">
+    <div class="p-8 sm:p-12 bg-white rounded-3xl shadow-2xl border-t-4 border-green-500">
+        <div class="mx-auto w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 animate-pulse">
+            <i data-lucide="thumbs-up" class="w-14 h-14 text-white" stroke-width="2.5"></i>
+        </div>
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Success! Order Placed.</h2>
+        <p class="text-lg text-gray-600 mb-6">Your order has been successfully confirmed. A detailed receipt and shipping updates will be sent shortly.</p>
+        
+        <div class="space-y-3 mb-8 p-4 bg-green-50 rounded-xl border border-green-200">
+            <div class="flex justify-between font-medium text-gray-800">
+                <span>Order ID:</span>
+                <span class="font-mono bg-white px-2 py-0.5 rounded-md text-sm shadow-inner">XYZ-456-7890</span>
+            </div>
+            <div class="flex justify-between font-medium text-gray-800">
+                <span>Total Charged:</span>
+                <span class="text-green-600 font-extrabold text-xl">{{ total }}৳</span>
+            </div>
+            <div class="flex justify-between font-medium text-gray-800">
+                <span>Delivery Estimate:</span>
+                <span class="text-gray-900">4-7 Business Days</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#" class="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-800 text-base font-medium rounded-xl hover:bg-gray-100 transition duration-150">
+                <i data-lucide="truck" class="w-5 h-5 mr-2"></i>
+                Track My Order
+            </a>
+
+            <a href="{% url 'home' %}" class="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-indigo-600 text-white text-base font-medium rounded-xl shadow-lg hover:bg-indigo-700 transition duration-150">
+                <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i>
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+</div>

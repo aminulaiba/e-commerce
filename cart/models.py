@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db.models import Sum
+import uuid
 
 from store.models import Product
 
@@ -37,6 +38,10 @@ class CartItem(models.Model):
     def __str__(self):
         return f"Cart {self.id} ({self.product.name}) {self.cart.user}"
 
+
+
+def generate_order_number():
+    return uuid.uuid4().hex[:12].upper()
 class Order(models.Model):
     ORDER_STATUS = [
         ('pending', 'Pending Payment'),
@@ -48,19 +53,21 @@ class Order(models.Model):
         ('refunded', 'Refunded'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    order_number = models.CharField(max_length=20, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', blank=True, null=True)
+    order_number = models.CharField(max_length=20, unique=True, default=generate_order_number)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.TextField()
     # billing_address = models.TextField(blank=True, null=True)
-    payment_method = models.CharField(max_length=50)
+    payment_method = models.CharField(max_length=50, default='cod')
     transaction_id = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
-        return f"Order #{self.order_number} - {self.user.username}"
+        # return f"Order #{self.order_number} - {self.user.username}"
+        user_part = self.user.username if self.user else "Unknown User"
+        return f"Order #{self.order_number} - {user_part}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -87,5 +94,5 @@ class Shipping(models.Model):
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.full_name} ({self.phone}) -- {self.address_line_1}"
+        return f"id: {self.id} {self.full_name} ({self.phone}) -- {self.address_line_1}"
     

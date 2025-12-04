@@ -73,13 +73,17 @@ class SessionCart:
             sub_tot = float(current_price*cart[str(prod.id)])
             total += sub_tot
         return total
+    
+    def clear(self):
+        self.session['cart'] = {}
+        self.session.modified = True
 
 
 
 
 
 
-#  cart from db for logged in user
+# cart from db for logged in user
 class DBCart:
     def __init__(self, user):
         self.user = user
@@ -136,10 +140,14 @@ class DBCart:
 
         total = self.checkout_totals(cart_items)
         return total_quantity, total
+    
+    def cart_delete(self):
+        if self.cart:
+            self.cart.delete()
 
 
 
-#  cart manager that switches between sessio and db
+# cart manager that switches between sessio and db
 class CartManager:
     def __init__(self, request):
         self.request = request
