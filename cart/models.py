@@ -2,7 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db.models import Sum
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
 import uuid
+import datetime
 
 from store.models import Product
 
@@ -45,19 +48,26 @@ def generate_order_number():
 class Order(models.Model):
     ORDER_STATUS = [
         ('pending', 'Pending Payment'),
+        ('processing', 'Processing'),
         ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    ORDER_DELIVERY_STATUS = [
         ('processing', 'Processing'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
         ('refunded', 'Refunded'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', blank=True, null=True)
     order_number = models.CharField(max_length=20, unique=True, default=generate_order_number)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
+    delivery_status = models.CharField(max_length=20, choices=ORDER_DELIVERY_STATUS, default='processing', db_index=True)
+    delivery_date = models.DateTimeField(blank=True, null=True)
+    
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.TextField()
     # billing_address = models.TextField(blank=True, null=True)
@@ -68,6 +78,14 @@ class Order(models.Model):
         # return f"Order #{self.order_number} - {self.user.username}"
         user_part = self.user.username if self.user else "Unknown User"
         return f"Order #{self.order_number} - {user_part}"
+    
+@receiver(pre_save, sender=Order)
+def delivered_date_set(sender, instance, **kwarg):
+    if instance.pk:
+        old_obj = sender.objects.get(pk=instance.pk)
+        if instance.delivery_status == "delivered" and old_obj.delivery_status != "delivered": # old obj needs to be checked coz otherwise it will get updated each time with any updation of unrelated fields.
+            instance.delivery_date = datetime.datetime.now()
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
