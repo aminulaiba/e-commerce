@@ -1,0 +1,136 @@
+{% extends "order_management/base.html" %}
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+    <!-- main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+            
+            <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
+                    <p class="text-sm text-gray-500">Manage shipments and update statuses.</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-2">
+                    <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Processing</p>
+                            <h3 id="processing" class="text-2xl font-bold text-gray-800 mt-1"></h3>
+                        </div>
+                        <div class="p-2 bg-yellow-50 rounded-lg text-yellow-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipped</p>
+                            <h3 id="shipped" class="text-2xl font-bold text-gray-800 mt-1"></h3>
+                        </div>
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivered</p>
+                            <h3 id="delivered" class="text-2xl font-bold text-gray-800 mt-1"></h3>
+                        </div>
+                        <div class="p-2 bg-green-50 rounded-lg text-green-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Refunded</p>
+                            <h3 id="refunded" class="text-2xl font-bold text-gray-800 mt-1"></h3>
+                        </div>
+                        <div class="p-2 bg-red-50 rounded-lg text-red-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-t-xl shadow-sm border-b border-gray-200 px-6 py-4 flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                    <button data-status="all" onclick="changeFilter(this)" class="px-4 py-1.5 bg-white shadow-sm text-sm font-medium text-gray-800 rounded-md">All Orders</button>
+                    <button data-status="processing" onclick="changeFilter(this)" class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 rounded-md">Processing</button>
+                    <button data-status="shipped" onclick="changeFilter(this)" class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 rounded-md">Shipped</button>
+                    <button data-status="delivered" onclick="changeFilter(this)" class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 rounded-md">Delivered</button>
+                    <button data-status="refunded" onclick="changeFilter(this)" class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 rounded-md">Refunded</button>
+                </div>
+            </div>
+
+            <div class="relative w-full max-w-md hidden md:block my-5">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search by Order ID or Customer Name..." class="w-full py-2 pl-10 pr-4 bg-gray-100 border-transparent rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm transition-all">
+            </div>
+
+            <div class="bg-white rounded-b-xl shadow-sm overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-indigo-100 text-black-500 text-xs uppercase tracking-wider">
+                            <th class="px-6 py-4 font-semibold">Order ID</th>
+                            <th class="px-6 py-4 font-semibold">Date</th>
+                            <th class="px-6 py-4 font-semibold">Customer</th>
+                            <th class="px-6 py-4 font-semibold">Total</th>
+                            <th class="px-6 py-4 font-semibold">Payment</th>
+                            <th class="px-6 py-4 font-semibold">Status</th>
+                            <th class="px-6 py-4 font-semibold text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="ordersTableBody">
+
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing
+                            <span id="curpage" class="font-medium"></span>
+                            to
+                            <span id="totpage" class="font-medium"></span>
+                            of
+                            <span id="totitems" class="font-medium"></span>
+                            results
+                        </p>
+                    </div>
+                        <div>
+                            <div class="flex items-center justify-between mt-4">
+                            <button id="prevBtn" class="px-3 py-1 border rounded">Prev</button>
+
+                            <div id="pageNumbers" class="flex gap-2"></div>
+
+                            <button id="nextBtn" class="px-3 py-1 border rounded">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    {% include 'order_management/order-details.html' %}
+{% endblock %}
