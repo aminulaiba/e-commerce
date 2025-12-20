@@ -34,6 +34,8 @@ def login_orderpage(request):
         else:
             messages.error(request, "Wrong username or password.")
             return redirect('oms-login')
+    elif is_order_managment(user=request.user):
+        return redirect('orders')
     return render(request, 'order_management/login.html')
 
 def logout_orderpage(request):
