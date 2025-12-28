@@ -12,8 +12,8 @@ CSRF_TRUSTED_ORIGINS = ['https://e-commerce-production-2463.up.railway.app']
 
 
 INSTALLED_APPS += [
-    'cloudinary_storage',
     'cloudinary',
+    'django_cloudinary_storage',
 ]
 
 
@@ -35,7 +35,7 @@ DATABASES = {
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # optional but recommended
 
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'django_cloudinary_storage.storage.MediaCloudinaryStorage'
 # CLOUDINARY_STORAGE = {
 #     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
 #     'API_KEY': os.environ.get('API_KEY'),
