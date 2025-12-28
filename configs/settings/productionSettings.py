@@ -4,8 +4,17 @@ DEBUG = False
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-ALLOWED_HOSTS = ['e-commerce-production-2463.up.railway.app', 'https://e-commerce-production-2463.up.railway.app']
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is not set")
+
+ALLOWED_HOSTS = ['e-commerce-production-2463.up.railway.app']
 CSRF_TRUSTED_ORIGINS = ['https://e-commerce-production-2463.up.railway.app']
+
+
+INSTALLED_APPS += [
+    'cloudinary_storage',
+    'cloudinary',
+]
 
 
 DATABASES = {
@@ -18,3 +27,20 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT'),
     }
 }
+
+
+
+# This storage backend compresses files (gzip/brotli) and adds hashed filenames 
+# so browsers can cache them safely and load updated versions automatically.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # optional but recommended
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+#     'API_KEY': os.environ.get('API_KEY'),
+#     'API_SECRET': os.environ.get('API_SECRET')
+# }
+
+
+
