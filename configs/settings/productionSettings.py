@@ -13,7 +13,7 @@ CSRF_TRUSTED_ORIGINS = ['https://e-commerce-production-2463.up.railway.app']
 
 INSTALLED_APPS += [
     'cloudinary',
-    'django_cloudinary_storage',
+    'cloudinary_storage',
 ]
 
 
@@ -29,13 +29,14 @@ DATABASES = {
 }
 
 
-
-# This storage backend compresses files (gzip/brotli) and adds hashed filenames 
-# so browsers can cache them safely and load updated versions automatically.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # optional but recommended
-
-
-DEFAULT_FILE_STORAGE = 'django_cloudinary_storage.storage.MediaCloudinaryStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 # CLOUDINARY_STORAGE = {
 #     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
 #     'API_KEY': os.environ.get('API_KEY'),
